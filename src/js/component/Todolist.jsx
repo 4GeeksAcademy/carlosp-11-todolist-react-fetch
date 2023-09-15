@@ -3,22 +3,24 @@ import React, { useState, useEffect } from "react";
 
 //Construimos el componente
 const TodoList = () => {
-
     //Definimos las funciones y variables
     const [task, setTask] = useState("");
     const [taskList, setTaskList] = useState([]);
+
+
     const addTask = (event) => {
         event.preventDefault();
-       // if (task.trim() != '') setTaskList([...taskList, task]);
-       // {label:'la tarea agregada en el input', done: false}
-        if (task.trim() != ''){
-            console.log(taskList);
-             setTaskList([...taskList, {"label": task, "done": false}]);
-             console.log(task, taskList);
+       if (task.trim() != ''){
+            let newTask = {label: task, 
+                           done: false, 
+                           id: taskList.length + 1}
+            let newList = [...taskList, newTask] 
+            updateTodos(newList);
+            setTaskList(newList);
+            setTask('');
         }
-        updateTodos();
-        setTask('');
     }
+    
     const deleteTask = (pendingTask) => {
         setTaskList(taskList.filter((item, id) => pendingTask !== item));
     }
@@ -29,7 +31,7 @@ const TodoList = () => {
     const getTodos = async () => {
         const url = base_url + '/todos/user/' + user_name;
         const options = {
-            methods: "GET",
+            method: "GET",
             headers: { "Content-Type": "application/json" }
         }
         const response = await fetch(url, options)
@@ -44,20 +46,18 @@ const TodoList = () => {
 
     }
 
-    const updateTodos = async () => {
+    const updateTodos = async (updateList) => {
         const url = base_url + '/todos/user/' + user_name;
         const options = {
-            methods: "PUT",
+            method: "PUT",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(taskList)
+            body: JSON.stringify(updateList)
         }
-        console.log(options, taskList);
         const response = await fetch(url, options)
         if (response.ok) {
             const data = await response.json();
-            console.log('data', data);
             // hacer algo para que lo q tiene data lo pueda ver afuera de la fx
-            setTaskList(data);
+            // setTaskList(data); esto es de la copia del codigo anterion, aquí no hace falta
         } else {
             console.log("error");
         }
